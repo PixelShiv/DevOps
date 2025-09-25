@@ -33,7 +33,8 @@ agent { label 'Agent-01' }
 
     post {
         always {
-            archiveArtifacts artifacts: 'myfirmware.*', fingerprint: true
+            archiveArtifacts artifacts: 'build/myfirmware.*', fingerprint: true
+
         }
         success {
             emailext(
