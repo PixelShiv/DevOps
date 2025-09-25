@@ -33,34 +33,35 @@ pipeline {
 
     post {
         always {
+            echo 'Archiving build artifacts...'
             archiveArtifacts artifacts: 'build/myfirmware.*', fingerprint: true
         }
 
         success {
+            echo 'Build succeeded! Sending email...'
             emailext(
                 subject: "Build Success: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
                 body: "<p>Build succeeded in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
-                to: "${RECIPIENT}",
-                from: "pshivakumar2805@gmail.com",
-                smtpCredentialId: 'gmail-creds'   // Jenkins credentials ID
+                to: "${RECIPIENT}"
+                // Optional: from can be set here if needed, otherwise use global SMTP from Manage Jenkins
             )
         }
 
         unstable {
+            echo 'Build unstable. Sending email...'
             emailext(
                 subject: "Build Unstable: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
                 body: "<p>Build is <b>UNSTABLE</b> in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
-                to: "${RECIPIENT}",
-                from: "pshivakumar2805@gmail.com",
-                smtpCredentialId: 'gmail-creds'
+                to: "${RECIPIENT}"
             )
         }
 
         failure {
+            echo 'Build failed. Sending email...'
             emailext(
                 subject: "Build Failed: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
                 body: "<p>Build <b>FAILED</b> in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
-                to: "${RECIPIENT}",
+                to: "${RECIPIENT}"
             )
         }
     }
