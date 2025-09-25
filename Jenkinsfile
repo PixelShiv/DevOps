@@ -32,6 +32,9 @@ pipeline {
     }
 
     post {
+        always {
+            archiveArtifacts artifacts: 'myfirmware.*', fingerprint: true
+        }
         success {
             emailext(
                 subject: "Build Success: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
