@@ -1,51 +1,52 @@
 pipeline {
-    agent { label 'linuxgit' }
-
-    environment {
-        GIT_REPO = 'https://github.com/PixelShiv/DevOps.git'
-        BRANCH = 'master'
+  agent { label 'linuxgit' } // change to 'any' if you do not have that label
+  environment {
+    GIT_REPO = 'https://github.com/PixelShiv/DevOps.git'
+    BRANCH   = 'master'
+    RECIPIENT = 'kumarpshivap@gmail.com' email
+  stages {
+    stage('Clean Workspace') {
+      steps {
+        echo 'Cleaning workspace'
+        deleteDir()
+      }
     }
-    
-    stages {
-        stage('Clean Workspace') {
-            steps {
-                echo 'CLeaning workspace'
-                deleteDir()
-            }
-        }
-        stage('Lint') {
-            steps {
-                echo "Cloning the repo from Gitlab ........."
-                git branch: "${BRANCH}",
-                    url: "${GIT_REPO}",
-                    credentialsId: 'gitlab'
-            }
-        }
-     stage('Build') {
-            steps {
-                sh 'dos2unix build.sh'
-                sh 'chmod +x build.sh'
-                sh 'bash build.sh'
-            }
-        }
+    stage('Checkout') {
+      steps {
+        echo "Cloning ${GIT_REPO} branch ${BRANCH}"
+        git branch: "${BRANCH}", url: "${GIT_REPO}"
+      }
     }
+    stage('Build') {
+      steps {
+        sh 'dos2unix build.sh || true'
+        sh 'chmod +x build.sh'
+        sh './build.sh'
+      }
+    }
+  }
+  post {
+    success {
+      emailext(
+        subject: "Build Success: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+        body: "<p>Build succeeded in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
+        to: "${RECIPIENT}"
+      )
+    }
+    unstable {
+      emailext(
+        subject: "Build Unstable: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+        body: "<p>Build is <b>UNSTABLE</b> in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
+        to: "${RECIPIENT}"
+      )
+    }
+    failure {
+      emailext(
+        subject: "Build Failed: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+        body: "<p>Build <b>FAILED</b> in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
+        to: "${RECIPIENT}"
+      )
+    }
+  }
 }
-post {
-        always {
-        unstable {
-            echo 'Build marked as UNSTABLE!'
-            emailext (
-                subject: "Build Unstable: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: """<p>Build became <b>UNSTABLE</b> in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>""",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-            )
-        }
-        failure {
-            echo 'Build failed!'
-            emailext (
-                subject: "Build Failed: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: """<p>Build failed in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>""",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-            )
-        }
-    }
+
