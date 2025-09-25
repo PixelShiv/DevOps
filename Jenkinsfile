@@ -4,7 +4,7 @@ agent { label 'Agent-01' }
     environment {
         GIT_REPO  = 'https://github.com/PixelShiv/DevOps.git'
         BRANCH    = 'master'
-        RECIPIENT = 'kumarpshivap@gmail.com'
+        RECIPIENT = 'pshivakumar2805@gmail.com'
     }
 
     stages {
