@@ -61,8 +61,6 @@ pipeline {
                 subject: "Build Failed: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
                 body: "<p>Build <b>FAILED</b> in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
                 to: "${RECIPIENT}",
-                from: "pshivakumar2805@gmail.com",
-                smtpCredentialId: 'gmail-creds'
             )
         }
     }
