@@ -90,7 +90,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo 'Running SonarQube analysis...'
-                withSonarQubeEnv("${sonarQube}") {
+                withSonarQubeEnv("${'sonarQube'}") {
                     sh '''
                        sonar-scanner \
                           -Dsonar.projectKey=cmake_gitHub \
