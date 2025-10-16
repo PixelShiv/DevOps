@@ -1,68 +1,25 @@
 pipeline {
     agent any
-
     environment {
-        GIT_REPO  = 'https://github.com/PixelShiv/DevOps.git'
-        BRANCH    = 'master'
-        RECIPIENT = 'pshivakumar2805@gmail.com'
+        GIT_REPO = 'https://github.com/PixelShiv/DevOps.git'
+        BRANCH = 'master'
     }
-
     stages {
-        stage('Clean Workspace') {
+        stage('Prepare Tools') {
             steps {
-                echo 'Cleaning workspace'
-                deleteDir()
-            }
-        }
-
-        stage('Checkout') {
-            steps {
-                echo "Cloning ${GIT_REPO} branch ${BRANCH}"
-                git branch: "${BRANCH}", url: "${GIT_REPO}"
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'dos2unix build.sh || true'
-                sh 'chmod +x build.sh'
-                sh './build.sh'
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Archiving build artifacts...'
-            archiveArtifacts artifacts: 'build/myfirmware.*', fingerprint: true
-        }
-
-        success {
-            echo 'Build succeeded! Sending email...'
-            emailext(
-                subject: "Build Success: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: "<p>Build succeeded in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
-                to: "${RECIPIENT}"
-                // Optional: from can be set here if needed, otherwise use global SMTP from Manage Jenkins
-            )
-        }
-
-        unstable {
-            echo 'Build unstable. Sending email...'
-            emailext(
-                subject: "Build Unstable: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: "<p>Build is <b>UNSTABLE</b> in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
-                to: "${RECIPIENT}"
-            )
-        }
-
-        failure {
-            echo 'Build failed. Sending email...'
-            emailext(
-                subject: "Build Failed: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: "<p>Build <b>FAILED</b> in job <b>${env.JOB_NAME}</b> [#${env.BUILD_NUMBER}]</p>",
-                to: "${RECIPIENT}"
-            )
-        }
-    }
-}
+                echo 'Installing required tools...'
+                sh '''
+                    # Update and install Python3/pip3 if missing
+                    if ! command -v pip3 &>/dev/null; then
+                        sudo yum install -y python3 python3-pip || true
+                    fi
+                    # Install cmakelint
+                    pip3 install --quiet cmakelint
+                    # Install dos2unix
+                    if ! command -v dos2unix &>/dev/null; then
+                        sudo yum install -y dos2unix || true
+                    fi
+                    # Install cmake
+                    if ! command -v cmake &>/dev/null; then
+                        sudo yum install -y epel-release || true
+                        sudo yum install -y cma
