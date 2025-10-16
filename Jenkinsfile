@@ -92,7 +92,7 @@ pipeline {
                 echo 'Running SonarQube analysis...'
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
                     sh '''
-                       sonar-scanner \
+                       /opt/sonar-scanner-7.3.0.5189-linux-x64/bin/sonar-scanner \
                           -Dsonar.projectKey=cmake_gitHub \
                           -Dsonar.sources=. \
                           -Dsonar.host.url=http://ec2-34-228-65-188.compute-1.amazonaws.com:9000 \
