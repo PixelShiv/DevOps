@@ -7,8 +7,8 @@ pipeline {
 
         // SonarQube Configuration
         SONARQUBE_ENV = 'sonarQube'
-        SONAR_PROJECT_KEY = 'PixelShiv_DevOps'
-        SONAR_PROJECT_NAME = 'DevOps'
+        SONAR_PROJECT_KEY = 'cmake-tocken'
+        SONAR_PROJECT_NAME = 'cmake-tocken'
         SONAR_HOST_URL = 'http://ec2-34-228-65-188.compute-1.amazonaws.com:9000'
     }
 
