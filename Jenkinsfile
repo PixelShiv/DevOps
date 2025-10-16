@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'cmake_Project' }
+    agent any
 
     environment {
         GIT_REPO  = 'https://github.com/PixelShiv/DevOps.git'
