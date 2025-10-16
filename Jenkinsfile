@@ -1,8 +1,8 @@
 pipeline {
-    agent any
+    agent { label 'linuxgit' }
     environment {
-        GIT_REPO = 'https://github.com/PixelShiv/DevOps.git'
-        BRANCH = 'master'
+        GIT_REPO = 'https://gitlab.com/sandeep160/pipeline-e2e.git'
+        BRANCH = 'main'
     }
     stages {
         stage('Prepare Tools') {
@@ -22,4 +22,62 @@ pipeline {
                     # Install cmake
                     if ! command -v cmake &>/dev/null; then
                         sudo yum install -y epel-release || true
-                        sudo yum install -y cma
+                        sudo yum install -y cmake || true
+                    fi
+                    
+                    # Install GCC/G++ compilers for C/C++ build
+                    if ! command -v gcc &>/dev/null; then
+                        sudo yum install -y gcc gcc-c++ || true
+                    fi
+                '''
+            }
+        }
+        stage('Lint') {
+            steps {
+                echo 'Running lint checks on main.c...'
+                sh '''
+                    if [ -f src/main.c ]; then
+                        cmakelint main.c > lint_report.txt
+                        # Fail build if lint errors found (uncomment if strict)
+                        # grep -q "Total Errors: [1-9]" lint_report.txt && exit 1 || true
+                    else
+                        echo "main.c not found!"
+                        exit 1
+                    fi
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'lint_report.txt', fingerprint: true
+                    fingerprint 'main.c'
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Running build.sh...'
+                sh '''
+                    if [ -f build.sh ]; then
+                        dos2unix build.sh
+                        chmod +x build.sh
+                        bash build.sh
+                    else
+                        echo "build.sh not found!"
+                        exit 1
+                    fi
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Build and lint completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs.'
+        }
+    }
+}
