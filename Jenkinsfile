@@ -92,13 +92,11 @@ pipeline {
                 echo 'Running SonarQube analysis...'
                 withSonarQubeEnv("${sonarQube}") {
                     sh '''
-                        sonar-scanner \
-                          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                          -Dsonar.projectName=${SONAR_PROJECT_NAME} \
-                          -Dsonar.sources=src \
-                          -Dsonar.host.url=${SONAR_HOST_URL} \
-                          -Dsonar.login=${key-sonar} \
-                          -Dsonar.sourceEncoding=UTF-8
+                       sonar-scanner \
+                          -Dsonar.projectKey=cmake_gitHub \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=http://ec2-34-228-65-188.compute-1.amazonaws.com:9000 \
+                          -Dsonar.token=sqp_b66d8b5be67af414a1dd1a561143f86f1d117d20
                     '''
                 }
             }
