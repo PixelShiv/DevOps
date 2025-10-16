@@ -1,8 +1,8 @@
 pipeline {
-    agent { label 'linuxgit' }
+    agent any
     environment {
-        GIT_REPO = 'https://gitlab.com/sandeep160/pipeline-e2e.git'
-        BRANCH = 'main'
+        GIT_REPO = 'https://github.com/PixelShiv/DevOps.git'
+        BRANCH = 'master'
     }
     stages {
         stage('Prepare Tools') {
