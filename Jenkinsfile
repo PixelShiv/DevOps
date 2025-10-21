@@ -87,46 +87,22 @@ pipeline {
             }
         }
 
-    //     stage('SonarQube Analysis') {
-    //         steps {
-    //             echo 'Running SonarQube analysis...'
-    //             withSonarQubeEnv("${SONARQUBE_ENV}") {
-    //                 sh '''
-    //                    /opt/sonar-scanner-7.3.0.5189-linux-x64/bin/sonar-scanner \
-    //                       -Dsonar.projectKey=cmake_gitHub \
-    //                       -Dsonar.sources=. \
-    //                       -Dsonar.host.url=http://ec2-34-228-65-188.compute-1.amazonaws.com:9000 \
-    //                       -Dsonar.token=sqp_b66d8b5be67af414a1dd1a561143f86f1d117d20
-    //                 '''
-    //             }
-    //         }
-    //     }
-    // }
-    stage('📦 Upload to JFrog Artifactory') {
-    steps {
-        script {
-            echo '🔹 Starting JFrog Artifactory Upload...'
-
-            // Dynamically enter details (can be parameterized)
-            def artifactoryServer = Artifactory.server("${JFROG_SERVER_ID}")  // e.g., 'jfrog-server'
-            def uploadSpec = """{
-                "files": [
-                    {
-                        "pattern": "target/*.jar",
-                        "target": "my-repo/path/to/artifacts/",
-                        "flat": "true"
-                    }
-                ]
-            }"""
-
-            // Upload to Artifactory
-            def buildInfo = artifactoryServer.upload spec: uploadSpec
-            artifactoryServer.publishBuildInfo(buildInfo)
-
-            echo '✅ JFrog Artifactory upload completed successfully!'
+        stage('SonarQube Analysis') {
+            steps {
+                echo 'Running SonarQube analysis...'
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    sh '''
+                       /opt/sonar-scanner-7.3.0.5189-linux-x64/bin/sonar-scanner \
+                          -Dsonar.projectKey=cmake_gitHub \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=http://ec2-34-228-65-188.compute-1.amazonaws.com:9000 \
+                          -Dsonar.token=sqp_b66d8b5be67af414a1dd1a561143f86f1d117d20
+                    '''
+                }
+            }
         }
     }
-}
+  
 
   post {
         always {
